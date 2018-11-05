@@ -215,7 +215,7 @@ instruction("Thank you for playing and giving your best please go get an experim
 
 Risk_=pd.concat([R_trials,response_R_trials],axis=1,sort=False)
 Ambi=pd.concat([A_trials,response_A_trials],axis=1,sort=False)
-response_R_trials.to_csv("../data/R_%s.tsv"%(subj_id),sep='\t')
-response_A_trials.to_csv("../data/A_%s.tsv"%(subj_id),sep='\t')
+response_R_trials.to_csv("../data/%s_R.tsv"%(subj_id),sep='\t')
+response_A_trials.to_csv("../data/%s_A.tsv"%(subj_id),sep='\t')
 win.close()
 quit()
