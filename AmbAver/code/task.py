@@ -213,5 +213,9 @@ for i in range(len(A_trials)):
 
 instruction("Thank you for playing and giving your best please go get an experimenter and finish the session")
 
+Risk_=pd.concat([R_trials,response_R_trials],axis=1,sort=False)
+Ambi=pd.concat([A_trials,response_A_trials],axis=1,sort=False)
+response_R_trials.to_csv("../data/R_%s.tsv"%(subj_id),sep='\t')
+response_A_trials.to_csv("../data/A_%s.tsv"%(subj_id),sep='\t')
 win.close()
 quit()
