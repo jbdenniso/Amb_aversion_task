@@ -19,7 +19,7 @@ A_inst=["Instructions7.jpg","Instructions8.jpg","Instructions9.jpg",]
 
 # Trial data initlization
 #Hard-Coded stuff
-Machine_color=["slot_red.jpg","slot_green.jpg","slot_blue.jpg"]
+Machine_color=["slot_red.png","slot_green.png","slot_blue.png"]
 Machine_color=random.sample(Machine_color,len(Machine_color))
 Machine_color.append("Sure.jpg")
 Machine_color=np.array(Machine_color)
@@ -145,6 +145,10 @@ def choice(left_image,right_image,left_money,right_money,left_percent,right_perc
         # Draw the jpegs to the window's back buffer
     focus.draw()
     win.flip()
+    timer.reset()
+    # It seems to wait here on its own
+    event.clearEvents()
+    
     if np.logical_or(isinstance(left_percent,int),left_percent=="??"):
         LeftPercentage=visual.TextStim(win=win,text="%s %%"%(left_percent),pos=(-200,300),color=[-1,-1,-1],bold=True)
         LeftImage=visual.ImageStim(image=Stimdir+left_image,win=win,pos=[-200,200])
@@ -162,24 +166,56 @@ def choice(left_image,right_image,left_money,right_money,left_percent,right_perc
     else:
         RightPercentage=visual.TextStim(win=win,text="%s" %(right_percent),pos=(200,300),bold=True)
         RightMoney=visual.TextStim(win=win,text="$ %s"%(right_money),pos=(200,00),bold=True)
-
-    core.wait(np.round(random.uniform(1,3),decimals=2))
-
+    
     LeftMoney.draw()
     RightMoney.draw()
     LeftPercentage.draw()
     RightPercentage.draw()
     win.flip()
-    timer.reset()
-    core.wait(6)
-    #Flush the key buffer and mouse movements
-    event.clearEvents()
-    #Put the image on the screen
-    win.flip()
-    keypresses = event.getKeys()
-    RT=timer.getTime()
-    return keypresses,RT
+    core.wait(1)
+    #core.wait(np.round(random.uniform(1,3),decimals=2))
+    while timer.getTime() < duration:
+        if np.logical_or(isinstance(left_percent,int),left_percent=="??"):
+            LeftPercentage=visual.TextStim(win=win,text="%s %%"%(left_percent),pos=(-200,300),color=[-1,-1,-1],bold=True)
+            LeftImage=visual.ImageStim(image=Stimdir+left_image,win=win,pos=[-200,200])
+            LeftMoney=visual.TextStim(win=win,text="$ %s"%(left_money),pos=(-200,00),bold=True)
+            LeftImage.draw()
+        else:
+            LeftPercentage=visual.TextStim(win=win,text="%s"%(left_percent),pos=(-200,300),bold=True)
+            LeftMoney=visual.TextStim(win=win,text="$ %s"%(left_money),pos=(-200,00),bold=True)
+       
+        if np.logical_or(isinstance(right_percent,int),right_percent=="??"):
+            RightPercentage=visual.TextStim(win=win,text="%s %%"%(right_percent),pos=(200,300),color=[-1,-1,-1],bold=True)
+            RightImage=visual.ImageStim(image=Stimdir+right_image,win=win,pos=[200,200])
+            RightMoney=visual.TextStim(win=win,text="$ %s"%(right_money),pos=(200,00),bold=True)
+            RightImage.draw()
+        else:
+            RightPercentage=visual.TextStim(win=win,text="%s" %(right_percent),pos=(200,300),bold=True)
+            RightMoney=visual.TextStim(win=win,text="$ %s"%(right_money),pos=(200,00),bold=True)
+        LeftMoney.draw()
+        RightMoney.draw()
+        LeftPercentage.draw()
+        RightPercentage.draw()
+        win.flip()
+        #timer.reset()
+        #core.wait(6)
+        #Flush the key buffer and mouse movements
+        #Put the image on the screen
+        keypresses = event.getKeys()
+        RT=timer.getTime()
+        
+        if len(keypresses) > 0:
+            remaining_time = duration - RT
+            break;
     
+    if len(keypresses) > 0:
+        focus.draw()
+        win.flip()
+        core.wait(remaining_time)
+    else:
+        keypresses = ['NaN']
+    
+    return keypresses,[RT]
 
 # Get subjID
 subjDlg = gui.Dlg(title="JOCN paper - rate items")
@@ -193,6 +229,14 @@ if len(subj_id) < 1: # Make sure participant entered name
 if 'escape' in event.waitKeys():
     core.quit()
 
+# Create Output Files
+f = open("../data/%s_R.tsv"%(subj_id),'w')
+f.write('Keypress\tRT\n') #Give your csv text here.
+f.close()
+f = open("../data/%s_A.tsv"%(subj_id),'w')
+f.write('Keypress\tRT\n') #Give your csv text here.
+f.close()
+
 for page in R_inst:
     instruction(page)
 for i in range(len(R_trials)):
@@ -200,7 +244,15 @@ for i in range(len(R_trials)):
        left_money=R_trials.leftMachineMoneyAmounts[i],right_money=R_trials.rightMachineMoneyAmounts[i],
        left_percent=R_trials.leftMachinePercentages[i],right_percent=R_trials.rightMachinePercentages[i],
        duration=6)
-    response_R_trials=response_R_trials.append([keypress,RT],columns=['keypress','RT'])
+    print(response_R_trials)
+    print([keypress,RT])
+    if 'escape' in keypress:
+        core.quit()
+    trial_data = pd.DataFrame({"Keypress":keypress, 
+                                "RT":RT}) 
+    #response_R_trials=response_R_trials.append(trial_data) #columns=['keypress','RT']
+    #response_R_trials.to_csv("../data/%s_R.tsv"%(subj_id),sep='\t')
+    trial_data.to_csv("../data/%s_R.tsv"%(subj_id), mode='a', header=False,sep="\t",index=False)
     
 for page in A_inst:
     instruction(page)
@@ -209,13 +261,14 @@ for i in range(len(A_trials)):
        left_money=A_trials.leftMachineMoneyAmounts[i],right_money=A_trials.rightMachineMoneyAmounts[i],
        left_percent=A_trials.leftMachinePercentages[i],right_percent=A_trials.rightMachinePercentages[i],
        duration=6)
-    response_A_trials=response_A_trials.append([keypress,RT],columns=['keypress','RT'])
+
+    response_A_trials=response_A_trials.append([keypress,RT]) #columns=['keypress','RT']
 
 instruction("Thank you for playing and giving your best please go get an experimenter and finish the session")
 
 Risk_=pd.concat([R_trials,response_R_trials],axis=1,sort=False)
 Ambi=pd.concat([A_trials,response_A_trials],axis=1,sort=False)
-response_R_trials.to_csv("../data/%s_R.tsv"%(subj_id),sep='\t')
+#response_R_trials.to_csv("../data/%s_R.tsv"%(subj_id),sep='\t')
 response_A_trials.to_csv("../data/%s_A.tsv"%(subj_id),sep='\t')
 win.close()
 quit()
