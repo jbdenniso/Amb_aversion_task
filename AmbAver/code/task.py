@@ -1,5 +1,5 @@
 # Ambiguity through learned second order distributions
-from psychopy import visual, core, event, gui, data, sound, logging
+from psychopy import visual, core, event, data, logging, gui
 import sys
 import os
 import csv
@@ -23,8 +23,10 @@ Machine_color=["slot_red.png","slot_green.png","slot_blue.png"]
 Machine_color=random.sample(Machine_color,len(Machine_color))
 Machine_color.append("Sure.jpg")
 Machine_color=np.array(Machine_color)
-moneyTypes=np.array([1.50,3.00,5.00])
+
+moneyTypes=np.array([1.50,3.00,5.00,.75])
 percentageTypes=np.array([00,10,20,30,40,50,60,70,80,90,100])
+
 wide_d=np.array([0,0,0,0,1,1,1,2,2,3,7,8,8,9,9,9,10,10,10,10])
 narrow_d=np.array([2,3,3,4,4,4,5,5,5,5,5,5,5,5,6,6,6,7,7,8])
 skew_d=np.array([4,5,5,6,6,6,7,7,7,7,7,7,7,7,8,8,8,9,9,10])
@@ -46,14 +48,14 @@ N_trials=pd.DataFrame({'leftMachineTypes':[Machine_color[0]]*10,
               'leftMachineMoneyAmounts':moneyTypes[narrow_m][hand_index[range(10)]],
               'rightMachineTypes':[Machine_color[3]]*10,
               'rightMachinePercentages':["Safe"]*10,
-              'rightMachineMoneyAmounts':moneyTypes[[0]*10]})
+              'rightMachineMoneyAmounts':moneyTypes[[3]*10]})
 #defines all of the narrow trials where risk is on the right
 df2=pd.DataFrame({'rightMachineTypes':[Machine_color[0]]*10,
               'rightMachinePercentages':percentageTypes[narrow_d][hand_index[range(10,20)]],
               'rightMachineMoneyAmounts':moneyTypes[narrow_m][hand_index[range(10,20)]],
               'leftMachineTypes':[Machine_color[3]]*10,
               'leftMachinePercentages':["Safe"]*10,
-              'leftMachineMoneyAmounts':moneyTypes[[0]*10]})
+              'leftMachineMoneyAmounts':moneyTypes[[3]*10]})
 #puts the two together and shuffle the order
 N_trials=N_trials.append(df2,ignore_index=True)
 #N_trials= N_trials.sample(frac=1).reset_index(drop=True)
@@ -65,14 +67,14 @@ W_trials=pd.DataFrame({'leftMachineTypes':[Machine_color[1]]*10,
               'leftMachineMoneyAmounts':moneyTypes[wide_m][hand_index[range(10)]],
               'rightMachineTypes':[Machine_color[3]]*10,
               'rightMachinePercentages':["Safe"]*10,
-              'rightMachineMoneyAmounts':moneyTypes[[0]*10]})
+              'rightMachineMoneyAmounts':moneyTypes[[3]*10]})
 #defines all of the wide trials where risk is on the right
 df2=pd.DataFrame({'rightMachineTypes':[Machine_color[1]]*10,
               'rightMachinePercentages':percentageTypes[wide_d][hand_index[range(10,20)]],
               'rightMachineMoneyAmounts':moneyTypes[wide_m][hand_index[range(10,20)]],
               'leftMachineTypes':[Machine_color[3]]*10,
               'leftMachinePercentages':["Safe"]*10,
-              'leftMachineMoneyAmounts':moneyTypes[[0]*10]})
+              'leftMachineMoneyAmounts':moneyTypes[[3]*10]})
 #puts the two together and shuffle the order
 W_trials=W_trials.append(df2,ignore_index=True)
 #W_trials= N_trials.sample(frac=1).reset_index(drop=True)
@@ -84,14 +86,14 @@ S_trials=pd.DataFrame({'leftMachineTypes':[Machine_color[2]]*10,
               'leftMachineMoneyAmounts':moneyTypes[skew_m][hand_index[range(10)]],
               'rightMachineTypes':[Machine_color[3]]*10,
               'rightMachinePercentages':["Safe"]*10,
-              'rightMachineMoneyAmounts':moneyTypes[[0]*10]})
+              'rightMachineMoneyAmounts':moneyTypes[[3]*10]})
 #defines all of the Skewed trials where risk is on the right
 df2=pd.DataFrame({'rightMachineTypes':[Machine_color[2]]*10,
               'rightMachinePercentages':percentageTypes[skew_d][hand_index[range(10,20)]],
               'rightMachineMoneyAmounts':moneyTypes[skew_m][hand_index[range(10,20)]],
               'leftMachineTypes':[Machine_color[3]]*10,
               'leftMachinePercentages':["Safe"]*10,
-              'leftMachineMoneyAmounts':moneyTypes[[0]*10]})
+              'leftMachineMoneyAmounts':moneyTypes[[3]*10]})
 #puts the two together and shuffle the order
 S_trials=S_trials.append(df2,ignore_index=True)
 #S_trials= N_trials.sample(frac=1).reset_index(drop=True)
@@ -122,9 +124,9 @@ response_R_trials=pd.DataFrame(columns=['Keypress','RT'])
 response_A_trials=pd.DataFrame(columns=['Keypress','RT'])
 
 win=visual.Window(
-        size=[1200,1800],
+        fullscr=False,
+	size=[1000,1000],
         units="pix",
-        fullscr=False
         )
 #define instructions set
 def instruction(instructions):
@@ -150,22 +152,22 @@ def choice(left_image,right_image,left_money,right_money,left_percent,right_perc
     event.clearEvents()
     
     if np.logical_or(isinstance(left_percent,int),left_percent=="??"):
-        LeftPercentage=visual.TextStim(win=win,text="%s %%"%(left_percent),pos=(-200,300),color=[-1,-1,-1],bold=True)
+        LeftPercentage=visual.TextStim(win=win,text="%s %%"%(left_percent),pos=(-200,300),color=[-1,-1,-1],bold=True,size=1.5)
         LeftImage=visual.ImageStim(image=Stimdir+left_image,win=win,pos=[-200,200])
-        LeftMoney=visual.TextStim(win=win,text="$ %s"%(left_money),pos=(-200,00),bold=True)
+        LeftMoney=visual.TextStim(win=win,text="$ %s"%(left_money),pos=(-200,00),bold=True,size=1.5)
         LeftImage.draw()
     else:
-        LeftPercentage=visual.TextStim(win=win,text="%s"%(left_percent),pos=(-200,300),bold=True)
-        LeftMoney=visual.TextStim(win=win,text="$ %s"%(left_money),pos=(-200,00),bold=True)
+        LeftPercentage=visual.TextStim(win=win,text="%s"%(left_percent),pos=(-200,300),bold=True,size=1.5)
+        LeftMoney=visual.TextStim(win=win,text="$ %s"%(left_money),pos=(-200,00),bold=True,size=1.5)
    
     if np.logical_or(isinstance(right_percent,int),right_percent=="??"):
-        RightPercentage=visual.TextStim(win=win,text="%s %%"%(right_percent),pos=(200,300),color=[-1,-1,-1],bold=True)
+        RightPercentage=visual.TextStim(win=win,text="%s %%"%(right_percent),pos=(200,300),color=[-1,-1,-1],bold=True,size=1.5)
         RightImage=visual.ImageStim(image=Stimdir+right_image,win=win,pos=[200,200])
-        RightMoney=visual.TextStim(win=win,text="$ %s"%(right_money),pos=(200,00),bold=True)
+        RightMoney=visual.TextStim(win=win,text="$ %s"%(right_money),pos=(200,00),bold=True,size=1.5)
         RightImage.draw()
     else:
-        RightPercentage=visual.TextStim(win=win,text="%s" %(right_percent),pos=(200,300),bold=True)
-        RightMoney=visual.TextStim(win=win,text="$ %s"%(right_money),pos=(200,00),bold=True)
+        RightPercentage=visual.TextStim(win=win,text="%s" %(right_percent),pos=(200,300),bold=True,size=1.5)
+        RightMoney=visual.TextStim(win=win,text="$ %s"%(right_money),pos=(200,00),bold=True,size=1.5)
     
     LeftMoney.draw()
     RightMoney.draw()
@@ -176,22 +178,22 @@ def choice(left_image,right_image,left_money,right_money,left_percent,right_perc
     #core.wait(np.round(random.uniform(1,3),decimals=2))
     while timer.getTime() < duration:
         if np.logical_or(isinstance(left_percent,int),left_percent=="??"):
-            LeftPercentage=visual.TextStim(win=win,text="%s %%"%(left_percent),pos=(-200,300),color=[-1,-1,-1],bold=True)
+            LeftPercentage=visual.TextStim(win=win,text="%s %%"%(left_percent),pos=(-200,300),color=[-1,-1,-1],bold=True,size=1.5)
             LeftImage=visual.ImageStim(image=Stimdir+left_image,win=win,pos=[-200,200])
-            LeftMoney=visual.TextStim(win=win,text="$ %s"%(left_money),pos=(-200,00),bold=True)
+            LeftMoney=visual.TextStim(win=win,text="$ %s"%(left_money),pos=(-200,00),bold=True,size=1.5)
             LeftImage.draw()
         else:
-            LeftPercentage=visual.TextStim(win=win,text="%s"%(left_percent),pos=(-200,300),bold=True)
-            LeftMoney=visual.TextStim(win=win,text="$ %s"%(left_money),pos=(-200,00),bold=True)
+            LeftPercentage=visual.TextStim(win=win,text="%s"%(left_percent),pos=(-200,300),bold=True,size=1.5)
+            LeftMoney=visual.TextStim(win=win,text="$ %s"%(left_money),pos=(-200,00),bold=True,size=1.5)
        
         if np.logical_or(isinstance(right_percent,int),right_percent=="??"):
-            RightPercentage=visual.TextStim(win=win,text="%s %%"%(right_percent),pos=(200,300),color=[-1,-1,-1],bold=True)
+            RightPercentage=visual.TextStim(win=win,text="%s %%"%(right_percent),pos=(200,300),color=[-1,-1,-1],bold=True,size=1.5)
             RightImage=visual.ImageStim(image=Stimdir+right_image,win=win,pos=[200,200])
-            RightMoney=visual.TextStim(win=win,text="$ %s"%(right_money),pos=(200,00),bold=True)
+            RightMoney=visual.TextStim(win=win,text="$ %s"%(right_money),pos=(200,00),bold=True,size=1.5)
             RightImage.draw()
         else:
-            RightPercentage=visual.TextStim(win=win,text="%s" %(right_percent),pos=(200,300),bold=True)
-            RightMoney=visual.TextStim(win=win,text="$ %s"%(right_money),pos=(200,00),bold=True)
+            RightPercentage=visual.TextStim(win=win,text="%s" %(right_percent),pos=(200,300),bold=True,size=1.5)
+            RightMoney=visual.TextStim(win=win,text="$ %s"%(right_money),pos=(200,00),bold=True,size=1.5)
         LeftMoney.draw()
         RightMoney.draw()
         LeftPercentage.draw()
@@ -248,8 +250,9 @@ for i in range(len(R_trials)):
     print([keypress,RT])
     if 'escape' in keypress:
         core.quit()
-    trial_data = pd.DataFrame({"Keypress":keypress, 
-                                "RT":RT}) 
+    trial_data = pd.DataFrame({"Keypress":keypress, "RT":RT,
+                             'leftMachineTypes':R_trials.leftMachineTypes[i],'leftMachinePercentages':R_trials.leftMachinePercentages[i],'leftMachineMoneyAmounts':R_trials.leftMachineMoneyAmounts[i],
+                               'rightMachineTypes': R_trials.rightMachineTypes[i],'rightMachinePercentages': R_trials.rightMachinePercentages[i],'rightMachineMoneyAmounts':R_trials.rightMachineMoneyAmounts[i]}) 
     #response_R_trials=response_R_trials.append(trial_data) #columns=['keypress','RT']
     #response_R_trials.to_csv("../data/%s_R.tsv"%(subj_id),sep='\t')
     trial_data.to_csv("../data/%s_R.tsv"%(subj_id), mode='a', header=False,sep="\t",index=False)
@@ -261,14 +264,21 @@ for i in range(len(A_trials)):
        left_money=A_trials.leftMachineMoneyAmounts[i],right_money=A_trials.rightMachineMoneyAmounts[i],
        left_percent=A_trials.leftMachinePercentages[i],right_percent=A_trials.rightMachinePercentages[i],
        duration=6)
-
-    response_A_trials=response_A_trials.append([keypress,RT]) #columns=['keypress','RT']
+    print(response_R_trials)
+    print([keypress,RT])
+    if 'escape' in keypress:
+        core.quit()
+    trial_data = pd.DataFrame({"Keypress":keypress, "RT":RT,                            
+                             'leftMachineTypes':A_trials.leftMachineTypes[i],'leftMachinePercentages':A_trials.leftMachinePercentages[i],'leftMachineMoneyAmounts':A_trials.leftMachineMoneyAmounts[i],
+                               'rightMachineTypes': A_trials.rightMachineTypes[i],'rightMachinePercentages':A_trials.rightMachinePercentages[i],
+				'rightMachineMoneyAmounts':A_trials.rightMachineMoneyAmounts[i]}) 
+    #response_R_trials=response_R_trials.append(trial_data) #columns=['keypress','RT']
+    #response_R_trials.to_csv("../data/%s_R.tsv"%(subj_id),sep='\t')
+    trial_data.to_csv("../data/%s_A.tsv"%(subj_id), mode='a', header=False,sep="\t",index=False)
+    #response_A_trials=response_A_trials.append([keypress,RT]) #columns=['keypress','RT']
 
 instruction("Thank you for playing and giving your best please go get an experimenter and finish the session")
 
-Risk_=pd.concat([R_trials,response_R_trials],axis=1,sort=False)
-Ambi=pd.concat([A_trials,response_A_trials],axis=1,sort=False)
-#response_R_trials.to_csv("../data/%s_R.tsv"%(subj_id),sep='\t')
-response_A_trials.to_csv("../data/%s_A.tsv"%(subj_id),sep='\t')
+
 win.close()
 quit()
