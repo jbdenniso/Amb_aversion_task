@@ -347,8 +347,8 @@ for page in R_inst:
 #def risk_choice(lot_col,lot_m,lot_p,lot_left,sure_m):
 
 
-for i in range(2):
-#for i in range(len(R_trials)):
+#for i in range(2):
+for i in range(len(R_trials)):
     row=R_trials.iloc[i]
     print(row)
     resp,RT=risk_choice(row[3],row[2],row[1],row[0],row[4])
